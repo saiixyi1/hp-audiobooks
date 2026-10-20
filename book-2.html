@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Harry Potter and the Chamber of Secrets - Audiobook</title>
+  <style>
+    :root {
+      --bg-color: #121214;
+      --card-bg: #1a1a1e;
+      --accent-color: #7c3aed;
+      --accent-hover: #6d28d9;
+      --text-main: #f3f4f6;
+      --text-sub: #9ca3af;
+      --border-color: #27272a;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      width: 100%;
+      max-width: 450px;
+    }
+
+    /* Player Card Styling */
+    .player-card {
+      background: var(--card-bg);
+      padding: 24px;
+      border-radius: 16px;
+      text-align: center;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      border: 1px solid var(--border-color);
+    }
+
+    .cover-container {
+      position: relative;
+      width: 100%;
+      padding-top: 100%; /* 1:1 Square aspect ratio */
+      margin-bottom: 20px;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+    }
+
+    .cover-container img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    h2 {
+      font-size: 1.25rem;
+      margin: 0 0 6px 0;
+      font-weight: 600;
+    }
+
+    .book-title {
+      color: var(--text-sub);
+      font-size: 0.9rem;
+      margin-bottom: 20px;
+    }
+
+    audio {
+      width: 100%;
+      outline: none;
+      filter: invert(90%) hue-rotate(180deg);
+    }
+
+    /* Playlist Styling */
+    .playlist-card {
+      background: var(--card-bg);
+      padding: 16px;
+      border-radius: 16px;
+      border: 1px solid var(--border-color);
+      max-height: 250px;
+      overflow-y: auto;
+    }
+
+    .playlist-card h3 {
+      font-size: 0.95rem;
+      margin: 0 0 12px 4px;
+      color: var(--text-sub);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .playlist {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .playlist-item {
+      padding: 10px 14px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.03);
+      cursor: pointer;
+      font-size: 0.9rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background 0.2s, color 0.2s;
+      border: 1px solid transparent;
+    }
+
+    .playlist-item:hover {
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .playlist-item.active {
+      background: rgba(124, 58, 237, 0.15);
+      border-color: var(--accent-color);
+      color: #a78bfa;
+      font-weight: 500;
+    }
+
+    /* Navigation Buttons */
+    .nav-buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    .nav-btn {
+      flex: 1;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.05);
+      color: #ffffff;
+      text-decoration: none;
+      padding: 12px;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: background 0.2s;
+      border: 1px solid var(--border-color);
+    }
+
+    .nav-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .nav-btn.primary {
+      background: var(--accent-color);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .nav-btn.primary:hover {
+      background: var(--accent-hover);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Main Player Box -->
+    <div class="player-card">
+      <div class="cover-container">
+        <img id="book-cover" src="" alt="Book Cover">
+      </div>
+      
+      <h2 id="chapter-title">Select a Chapter</h2>
+      <div class="book-title" id="book-title-display">Audiobook Name</div>
+
+      <!-- HTML5 Audio Element -->
+      <audio id="audio-player" controls>
+        Your browser does not support the audio element.
+      </audio>
+    </div>
+
+    <!-- Playlist Box -->
+    <div class="playlist-card">
+      <h3>Chapters</h3>
+      <ul class="playlist" id="playlist">
+        <!-- Chapters generated dynamically -->
+      </ul>
+    </div>
+
+    <!-- Navigation Buttons -->
+    <div class="nav-buttons">
+      <a href="book-1.html" class="nav-btn">&larr; Book 1</a>
+      <a href="book-3.html" class="nav-btn primary">Book 3 &rarr;</a>
+    </div>
+  </div>
+
+  <script>
+    // --- BOOK 2 DATA ---
+    const audiobookData = {
+      bookTitle: "Harry Potter and the Chamber of Secrets",
+      coverImage: "https://i.pinimg.com/736x/28/10/43/2810438fa3efa882ac6e47e8ff7c1a28.jpg", // Replace with Book 2 cover link if desired
+      chapters: [
+        {
+          title: "Chapter 1: The Worst Birthday",
+          src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" // Replace with your Book 2 audio link
+        },
+        {
+          title: "Chapter 2: Dobby's Warning",
+          src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"
+        }
+      ]
+    };
+
+    // --- PLAYER LOGIC ---
+    const audioPlayer = document.getElementById('audio-player');
+    const chapterTitle = document.getElementById('chapter-title');
+    const bookTitleDisplay = document.getElementById('book-title-display');
+    const bookCover = document.getElementById('book-cover');
+    const playlistElement = document.getElementById('playlist');
+
+    let currentTrackIndex = 0;
+
+    bookTitleDisplay.textContent = audiobookData.bookTitle;
+    bookCover.src = audiobookData.coverImage;
+
+    function loadTrack(index) {
+      currentTrackIndex = index;
+      const track = audiobookData.chapters[index];
+      
+      chapterTitle.textContent = track.title;
+      audioPlayer.src = track.src;
+      
+      document.querySelectorAll('.playlist-item').forEach((item, idx) => {
+        if (idx === index) {
+          item.classList.add('active');
+        } else {
+          item.classList.remove('active');
+        }
+      });
+    }
+
+    audiobookData.chapters.forEach((chapter, index) => {
+      const li = document.createElement('li');
+      li.className = 'playlist-item';
+      li.textContent = chapter.title;
+      
+      li.addEventListener('click', () => {
+        loadTrack(index);
+        audioPlayer.play();
+      });
+      
+      playlistElement.appendChild(li);
+    });
+
+    audioPlayer.addEventListener('ended', () => {
+      if (currentTrackIndex < audiobookData.chapters.length - 1) {
+        loadTrack(currentTrackIndex + 1);
+        audioPlayer.play();
+      }
+    });
+
+    audioPlayer.addEventListener('timeupdate', () => {
+      localStorage.setItem('book2_time_' + currentTrackIndex, audioPlayer.currentTime);
+    });
+
+    audioPlayer.addEventListener('loadedmetadata', () => {
+      const savedTime = localStorage.getItem('book2_time_' + currentTrackIndex);
+      if (savedTime) {
+        audioPlayer.currentTime = parseFloat(savedTime);
+      }
+    });
+
+    loadTrack(0);
+  </script>
+
+</body>
+</html>
