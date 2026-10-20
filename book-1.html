@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Audiobook Player</title>
+  <style>
+    :root {
+      --bg-color: #121214;
+      --card-bg: #1a1a1e;
+      --accent-color: #7c3aed;
+      --accent-hover: #6d28d9;
+      --text-main: #f3f4f6;
+      --text-sub: #9ca3af;
+      --border-color: #27272a;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      width: 100%;
+      max-width: 450px;
+    }
+
+    /* Player Card Styling */
+    .player-card {
+      background: var(--card-bg);
+      padding: 24px;
+      border-radius: 16px;
+      text-align: center;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      border: 1px solid var(--border-color);
+    }
+
+    .cover-container {
+      position: relative;
+      width: 100%;
+      padding-top: 100%; /* Creates a nice book cover aspect ratio */
+      margin-bottom: 20px;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+    }
+
+    .cover-container img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    h2 {
+      font-size: 1.25rem;
+      margin: 0 0 6px 0;
+      font-weight: 600;
+    }
+
+    .book-title {
+      color: var(--text-sub);
+      font-size: 0.9rem;
+      margin-bottom: 20px;
+    }
+
+    audio {
+      width: 100%;
+      outline: none;
+      filter: invert(90%) hue-rotate(180deg); /* Gives standard audio controls a dark sleek look */
+    }
+
+    /* Playlist Styling */
+    .playlist-card {
+      background: var(--card-bg);
+      padding: 16px;
+      border-radius: 16px;
+      border: 1px solid var(--border-color);
+      max-height: 250px;
+      overflow-y: auto;
+    }
+
+    .playlist-card h3 {
+      font-size: 0.95rem;
+      margin: 0 0 12px 4px;
+      color: var(--text-sub);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .playlist {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .playlist-item {
+      padding: 10px 14px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.03);
+      cursor: pointer;
+      font-size: 0.9rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background 0.2s, color 0.2s;
+      border: 1px solid transparent;
+    }
+
+    .playlist-item:hover {
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .playlist-item.active {
+      background: rgba(124, 58, 237, 0.15);
+      border-color: var(--accent-color);
+      color: #a78bfa;
+      font-weight: 500;
+    }
+
+    /* Next Book Button Styling */
+    .next-book-btn {
+      display: block;
+      text-align: center;
+      background: var(--accent-color);
+      color: #ffffff;
+      text-decoration: none;
+      padding: 14px;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: background 0.2s, transform 0.1s;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+    }
+
+    .next-book-btn:hover {
+      background: var(--accent-hover);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Main Player Box -->
+    <div class="player-card">
+      <div class="cover-container">
+        <img id="book-cover" src="" alt="Book Cover">
+      </div>
+      
+      <h2 id="chapter-title">Select a Chapter</h2>
+      <div class="book-title" id="book-title-display">Audiobook Name</div>
+
+      <!-- HTML5 Audio Element -->
+      <audio id="audio-player" controls>
+        Your browser does not support the audio element.
+      </audio>
+    </div>
+
+    <!-- Playlist Box -->
+    <div class="playlist-card">
+      <h3>Chapters</h3>
+      <ul class="playlist" id="playlist">
+        <!-- Chapters are generated dynamically via JavaScript -->
+      </ul>
+    </div>
+
+    <!-- Next Book Button -->
+    <a href="book-2.html" class="next-book-btn">Next Book: Chamber of Secrets &rarr;</a>
+  </div>
+
+  <script>
+    // --- CUSTOMIZE YOUR AUDIOBOOK DATA HERE ---
+    const audiobookData = {
+      bookTitle: "Harry Potter and the Philosopher's Stone",
+      coverImage: "https://i.pinimg.com/736x/18/c2/e8/18c2e81e0ebfce2a34bf0b3788c68313.jpg", // Replace with your image link
+      chapters: [
+        {
+          title: "Chapter 1: The Boy Who Lived",
+          src: "https://ia903206.us.archive.org/1/items/01-i.-chapter-one-the-boy-who-lived/01%20-%20I.%20Chapter%20One%20-%20The%20Boy%20Who%20Lived.mp4" // Replace with your .mp3 link
+        },
+        {
+          title: "Chapter 2: The Vanishing Glass",
+          src: "https://ia600501.us.archive.org/8/items/02-ii.-chapter-two-the-vanishing-glass/02%20-%20II.%20Chapter%20Two%20-%20The%20Vanishing%20Glass.mp4" // Replace with your .mp3 link
+        },
+        {
+          title: "Chapter 3: The Letters from No One",
+          src: "https://ia903208.us.archive.org/25/items/03-iii.-chapter-three-the-letters-from-no-one/03%20-%20III.%20Chapter%20Three%20-%20The%20Letters%20From%20No%20One.mp4"
+        },
+        {
+          title: "Chapter 4: The Keeper of the Keys",
+          src: "https://ia600902.us.archive.org/24/items/04-iv.-chapter-four-the-keeper-of-the-keys/04%20-%20IV.%20Chapter%20Four%20-%20The%20Keeper%20of%20the%20Keys.mp4"
+        },
+        {
+          title: "Chapter 5: Diagon Alley",
+          src: "https://dn720602.ca.archive.org/0/items/05-v.-chapter-five-diagon-alley/05%20-%20V.%20Chapter%20Five%20-%20Diagon%20Alley.mp4"
+        },
+        {
+          title: "Chapter 6: The Journey from Platform Nine and Three-Quarters",
+          src: "https://dn721801.ca.archive.org/0/items/06-vi.-chapter-six-the-journey-from-platform-nine-and-three-quarters/06%20-%20VI.%20Chapter%20Six%20-%20The%20Journey%20from%20Platform%20Nine%20and%20Three-Quarters.mp4"
+        },
+        {
+          title: "Chapter 7: The Sorting Hat",
+          src: "https://dn710300.ca.archive.org/0/items/07-vii.-chapter-seven-the-sorting-hat/07%20-%20VII.%20Chapter%20Seven%20-%20The%20Sorting%20Hat.mp4"
+        },
+        {
+          title: "Chapter 8: The Potion Master",
+          src: "https://ia800501.us.archive.org/13/items/08-viii.-chapter-eight-the-potion-master/08%20-%20VIII.%20Chapter%20Eight%20-%20The%20Potion%20Master.mp4"
+        },
+        {
+          title: "Chapter 9: The Midnight Duel",
+          src: "https://dn710406.ca.archive.org/0/items/09-l-x.-chapter-nine-the-midnight-duel/09%20-%20lX.%20Chapter%20Nine%20-%20The%20Midnight%20Duel.mp4"
+        },
+        {
+          title: "Chapter 10: Halloween",
+          src: "https://dn721904.ca.archive.org/0/items/10-x.-chapter-ten-halloween/10%20-%20X.%20Chapter%20Ten%20-%20Halloween.mp4"
+        },
+        {
+          title: "Chapter 11: Quidditch",
+          src: "https://dn721904.ca.archive.org/0/items/11-xi.-chapter-eleven-quidditch/11%20-%20XI.%20Chapter%20Eleven%20-%20Quidditch.mp4"
+        },
+        {
+          title: "Chapter 12: The Mirror of Erised",
+          src: "https://ia600407.us.archive.org/4/items/12-xii.-chapter-twelve-the-mirror-of-erised/12%20-%20XII.%20Chapter%20Twelve%20-%20The%20Mirror%20of%20Erised.mp4"
+        },
+        {
+          title: "Chapter 13: Nicolas Flamel",
+          src: "https://dn721908.ca.archive.org/0/items/13-xiii.-chapter-thirteen-nicolas-flamel/13%20-%20XIII.%20Chapter%20Thirteen%20-%20Nicolas%20Flamel.mp4"
+        },
+        {
+          title: "Chapter 14: Norbert the Norwegian Ridgeback",
+          src: "https://dn711509.ca.archive.org/0/items/14-xiv.-chapter-fourteen-norbert-the-norwegian-ridgeback/14%20-%20XIV.%20Chapter%20Fourteen%20-%20Norbert%20the%20Norwegian%20Ridgeback.mp4"
+        },
+        {
+          title: "Chapter 15: The Forbidden Forest",
+          src: "https://ia903201.us.archive.org/30/items/15-xv.-chapter-fifteen-the-forbidden-forest/15%20-%20XV.%20Chapter%20Fifteen%20-%20The%20Forbidden%20Forest.mp4"
+        },
+        {
+          title: "Chapter 16: Through the Trapdoor",
+          src: "https://ia800606.us.archive.org/23/items/16-xvi.-chapter-sixteen-through-the-trapdoor/16%20-%20XVI.%20Chapter%20Sixteen%20-%20Through%20the%20Trapdoor.mp4"
+        },
+        {
+          title: "Chapter 17: The Man with Two Faces",
+          src: "https://ia800103.us.archive.org/5/items/17-xvii.-chapter-seventeen-the-man-with-two-faces/17%20-%20XVII.%20Chapter%20Seventeen%20-%20The%20Man%20with%20Two%20Faces.mp4"
+        }
+      ]
+    };
+
+    // --- PLAYER LOGIC ---
+    const audioPlayer = document.getElementById('audio-player');
+    const chapterTitle = document.getElementById('chapter-title');
+    const bookTitleDisplay = document.getElementById('book-title-display');
+    const bookCover = document.getElementById('book-cover');
+    const playlistElement = document.getElementById('playlist');
+
+    let currentTrackIndex = 0;
+
+    // Load initial info
+    bookTitleDisplay.textContent = audiobookData.bookTitle;
+    bookCover.src = audiobookData.coverImage;
+
+    function loadTrack(index) {
+      currentTrackIndex = index;
+      const track = audiobookData.chapters[index];
+      
+      chapterTitle.textContent = track.title;
+      audioPlayer.src = track.src;
+      
+      // Update active state styling in the playlist
+      document.querySelectorAll('.playlist-item').forEach((item, idx) => {
+        if (idx === index) {
+          item.classList.add('active');
+        } else {
+          item.classList.remove('active');
+        }
+      });
+    }
+
+    // Build the playlist UI
+    audiobookData.chapters.forEach((chapter, index) => {
+      const li = document.createElement('li');
+      li.className = 'playlist-item';
+      li.textContent = chapter.title;
+      
+      li.addEventListener('click', () => {
+        loadTrack(index);
+        audioPlayer.play();
+      });
+      
+      playlistElement.appendChild(li);
+    });
+
+    // Auto-play next chapter when current one finishes
+    audioPlayer.addEventListener('ended', () => {
+      if (currentTrackIndex < audiobookData.chapters.length - 1) {
+        loadTrack(currentTrackIndex + 1);
+        audioPlayer.play();
+      }
+    });
+
+    // --- SAVE AND RESUME PROGRESS ---
+    audioPlayer.addEventListener('timeupdate', () => {
+      localStorage.setItem('audiobook_time_' + currentTrackIndex, audioPlayer.currentTime);
+    });
+
+    audioPlayer.addEventListener('loadedmetadata', () => {
+      const savedTime = localStorage.getItem('audiobook_time_' + currentTrackIndex);
+      if (savedTime) {
+        audioPlayer.currentTime = parseFloat(savedTime);
+      }
+    });
+
+    // Load the first track by default (paused)
+    loadTrack(0);
+  </script>
+
+</body>
+</html>
